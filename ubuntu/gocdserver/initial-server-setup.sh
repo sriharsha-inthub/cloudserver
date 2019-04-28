@@ -16,7 +16,7 @@
  echo "[Task 5] — Allow OpenSSH"
  ufw allow OpenSSH > /dev/null 2>&1
  echo "[Task 6] — Enable Firewall"
- ufw enable -y > /dev/null 2>&1
+ ufw --force enable -y > /dev/null 2>&1
  echo "[Task 7] — Verifying Firewall is running"
  ufw status
  echo "[Task 6] — Enabling External Access for Your Regular User"

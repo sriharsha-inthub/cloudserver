@@ -1,2 +1,2 @@
- JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
- GO_JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
+ JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
+ GO_JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/jre"
