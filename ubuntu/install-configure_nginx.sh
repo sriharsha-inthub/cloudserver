@@ -26,12 +26,12 @@
  chmod -R 755 /var/www/inthub.dev
  echo "[Task 10] — Setting up index page for inthub.dev & gateway.inthub.dev"
  
- cp index.nginx-debian.html /var/www/html/index.nginx-debian.html
- cp inthub.dev.index.html /var/www/inthub.dev/html/inthub.dev.index.html
+ cp htmls/index.nginx-debian.html /var/www/html/index.nginx-debian.html
+ cp htmls/inthub.dev.index.html /var/www/inthub.dev/html/inthub.dev.index.html
  
  echo "[Task 11] — Setting up nginx server block for inthub.dev"
- cp inthub.dev /etc/nginx/sites-available/inthub.dev
- cp default /etc/nginx/sites-available/default
+ cp configs/inthub.dev /etc/nginx/sites-available/inthub.dev
+ cp configs/default /etc/nginx/sites-available/default
  
  echo "[Task 12] - Enabling the inthub.dev for Nginx" 
  ln -s /etc/nginx/sites-available/inthub.dev /etc/nginx/sites-enabled/
