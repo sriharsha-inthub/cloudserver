@@ -38,6 +38,9 @@
  echo "Update file [/etc/nginx/nginx.conf] - uncomment server_names_hash_bucket_size ***"
  nginx -t
  systemctl restart nginx
+ echo ""
+ curl http://inthub.dev
+ echo ""
  echo "################# Completed #################"
  echo ""
  
