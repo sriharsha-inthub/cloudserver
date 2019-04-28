@@ -16,13 +16,13 @@
  systemctl reload nginx
  
  echo "[Task 6]-  Obtaining an SSL Certificate"
- certbot --nginx -d inthub.dev -d www.inthub.dev --non-interactive --agree-tos -m harshu.1982@gmail.com
+ certbot --nginx -d inthub.dev -d gateway.inthub.dev -d www.inthub.dev --non-interactive --agree-tos -m $1
  
  echo "[Task 7]- Verifying Certbot Auto-Renewal"
  certbot renew --dry-run
  
-
+ curl --max-time 5 https://inthub.dev | grep "inthub.dev - a dev project(s) domain"
  
-
- 
- 
+ echo ""
+ echo "################# Completed #################"
+ echo ""

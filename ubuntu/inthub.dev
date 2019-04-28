@@ -5,7 +5,7 @@
         root /var/www/inthub.dev/html;
         index inthub.dev.index.html inthub.dev.index.index.htm;
 
-        server_name inthub.dev www.inthub.dev;
+        server_name gateway.inthub.dev;
 
         location / {
                 try_files $uri $uri/ =404;
