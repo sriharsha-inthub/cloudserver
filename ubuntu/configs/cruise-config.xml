@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="115">
+  <server artifactsdir="artifacts" jobTimeout="5" agentAutoRegisterKey="70247304-e910-4044-826c-95cba48e7190" webhookSecret="41b2740f-4cfb-49cd-b04f-358003aa1699" commandRepositoryLocation="default" serverId="e460f995-9188-41a1-9c70-1e6dfd3c219e" tokenGenerationKey="6fbb80c3-9d78-43ff-b8f5-a8f313986c73">
+    <security>
+      <authConfigs>
+        <authConfig id="go-cd-passwd-fl-adminauth" pluginId="cd.go.authentication.passwordfile">
+          <property>
+            <key>PasswordFilePath</key>
+            <value>/var/gocdauth/adminpasswd</value>
+          </property>
+        </authConfig>
+        <authConfig id="go-cd-passwd-fl-usersauth" pluginId="cd.go.authentication.passwordfile">
+          <property>
+            <key>PasswordFilePath</key>
+            <value>/var/gocdauth/userspasswd</value>
+          </property>
+        </authConfig>
+      </authConfigs>
+      <roles>
+        <role name="LogViewers">
+          <users>
+            <user>govwusr1</user>
+            <user>govwusr2</user>
+            <user>govwusr3</user>
+          </users>
+        </role>
+        <role name="Operators">
+          <users>
+            <user>gocfgusr2</user>
+            <user>gocfgusr1</user>
+          </users>
+        </role>
+        <role name="unitedair-approvers">
+          <users>
+            <user>buildaprvr</user>
+          </users>
+        </role>
+      </roles>
+      <admins>
+        <user>goadmin</user>
+      </admins>
+    </security>
+    <mailhost hostname="smtp.gmail.com" port="465" username="palavesam.s@gmail.com" encryptedPassword="AES:/3ablY7ZKk8KJTnLIGsloA==:G8pR+Ke6aatz9E3AEQ5N9A==" tls="true" from="palavesam.s@gmail.com" admin="palavesam@inthub.com.au" />
+    <backup emailOnSuccess="true" emailOnFailure="true" />
+  </server>
+  <scms>
+    <scm id="61d88b3a-e874-47b5-8996-c7bb20e6c035" name="gh-apdev-flights-ws">
+      <pluginConfiguration id="github.pr" version="1" />
+      <configuration>
+        <property>
+          <key>url</key>
+          <value>https://github.com/palavesam-mule/apdev-flights-ws.git</value>
+        </property>
+        <property>
+          <key>defaultBranch</key>
+          <value>master</value>
+        </property>
+        <property>
+          <key>username</key>
+          <value>palavesam-mule</value>
+        </property>
+        <property>
+          <key>password</key>
+          <encryptedValue>AES:hYRHrnMogbeAxw9xZw0FaA==:ADtYKaLsZAgmhtpTLf8M2g==</encryptedValue>
+        </property>
+      </configuration>
+    </scm>
+  </scms>
+  <pipelines group="Temperature-API">
+    <authorization>
+      <view>
+        <user>buildaprvr</user>
+        <role>LogViewers</role>
+        <role>Operators</role>
+      </view>
+      <operate>
+        <user>buildaprvr</user>
+        <role>Operators</role>
+      </operate>
+      <admins>
+        <user>gocfgusr1</user>
+        <user>gocfgusr2</user>
+      </admins>
+    </authorization>
+    <pipeline name="BUILD-TemperatureAPI" template="BUILD-Template">
+      <params>
+        <param name="APP-NAME">temperatureapi</param>
+      </params>
+      <environmentvariables>
+        <variable name="ANYPNT-ENV-ID">
+          <value>d7846a31-ff2a-40d5-b5c8-f00500865cbc</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>BUILD</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>temperatureapi-build</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <git url="https://palavesam-inthub:Stor$123@github.com/palavesam-inthub/TemperatureAPI" dest="app-src" />
+      </materials>
+    </pipeline>
+    <pipeline name="TEST-TemperatureAPI">
+      <environmentvariables>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPNT-ENV-ID">
+          <value>d3dd6fab-01a7-4d4a-8edb-d280aff13ace</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>UAT</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>temperatureapi-test</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>mule-pals2</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:fv5uqb2XdsWWRsBMBveorA==:1vpP1v5xf019Qc0RpuSXhQ==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <pipeline pipelineName="BUILD-TemperatureAPI" stageName="defaultStage" />
+      </materials>
+      <stage name="FetchArtifacts">
+        <jobs>
+          <job name="FetchUpstreamPipelineArtifacts">
+            <tasks>
+              <fetchartifact artifactOrigin="gocd" srcdir="build" dest="app-jar" pipeline="BUILD-TemperatureAPI" stage="defaultStage" job="defaultJob">
+                <runif status="passed" />
+              </fetchartifact>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="TEST-Deploy" fetchMaterials="false">
+        <approval type="manual" />
+        <jobs>
+          <job name="DeployToCloudHubUsingAPI">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\deploy_to_cloudhub_use_api.bat">
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\get_cloudhub_deployment_log.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="PROD-TemperatureAPI">
+      <environmentvariables>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPNT-ENV-ID">
+          <value>4ba19183-eff1-44b9-baff-e08610eeefb8</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>PROD</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>temperatureapi</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>mule-pals2</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:fv5uqb2XdsWWRsBMBveorA==:1vpP1v5xf019Qc0RpuSXhQ==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <pipeline pipelineName="TEST-TemperatureAPI" stageName="TEST-Deploy" />
+      </materials>
+      <stage name="FetchArtifacts">
+        <jobs>
+          <job name="FetchUpstreamPipelineArtifacts">
+            <tasks>
+              <fetchartifact artifactOrigin="gocd" srcdir="build" dest="app-jar" pipeline="BUILD-TemperatureAPI/TEST-TemperatureAPI" stage="defaultStage" job="defaultJob">
+                <runif status="passed" />
+              </fetchartifact>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="TEST-Deploy">
+        <approval type="manual" />
+        <jobs>
+          <job name="DeployToCloudHubUsingAPI">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\deploy_to_cloudhub_use_api.bat">
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\get_cloudhub_deployment_log.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <pipelines group="BASE-PIPELINES-TO-CLONE-AND-EXTEND">
+    <pipeline name="TEST-PipeLine-TO-CLONE">
+      <environmentvariables>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPNT-ENV-ID">
+          <value>d3dd6fab-01a7-4d4a-8edb-d280aff13ace</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>UAT</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>ToBeChanged</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>mule-pals2</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:fv5uqb2XdsWWRsBMBveorA==:1vpP1v5xf019Qc0RpuSXhQ==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <pipeline pipelineName="BUILD-Pipeline-TO-CLONE" stageName="defaultStage" />
+      </materials>
+      <stage name="FetchArtifacts">
+        <jobs>
+          <job name="FetchUpstreamPipelineArtifacts">
+            <tasks>
+              <fetchartifact artifactOrigin="gocd" srcdir="build" dest="app-jar" pipeline="BUILD-Pipeline-TO-CLONE" stage="defaultStage" job="defaultJob">
+                <runif status="passed" />
+              </fetchartifact>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="TEST-Deploy">
+        <approval type="manual" />
+        <jobs>
+          <job name="DeployToCloudHubUsingAPI">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\deploy_to_cloudhub_use_api.bat">
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\get_cloudhub_deployment_log.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="BUILD-Pipeline-TO-CLONE">
+      <materials>
+        <git url="https://github.com/palavesam-mule/mule-maven-deploy-cloudhub-test" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <ant />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="PROD-PipeLine-TO-CLONE">
+      <environmentvariables>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPNT-ENV-ID">
+          <value>d3dd6fab-01a7-4d4a-8edb-d280aff13ace</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>PROD</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>ToBeChanged</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>mule-pals2</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:fv5uqb2XdsWWRsBMBveorA==:1vpP1v5xf019Qc0RpuSXhQ==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <pipeline pipelineName="BUILD-Pipeline-TO-CLONE" stageName="defaultStage" />
+      </materials>
+      <stage name="FetchArtifacts">
+        <jobs>
+          <job name="FetchUpstreamPipelineArtifacts">
+            <tasks>
+              <fetchartifact artifactOrigin="gocd" srcfile="*" dest="app-jar" pipeline="BUILD-Pipeline-TO-CLONE" stage="defaultStage" job="defaultJob">
+                <runif status="passed" />
+              </fetchartifact>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="PROD-Deploy">
+        <approval type="manual" />
+        <jobs>
+          <job name="DeployToCloudHubUsingAPI">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\deploy_to_cloudhub_use_api.bat">
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\get_cloudhub_deployment_log.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <pipelines group="UNITEDAIRPORT">
+    <authorization>
+      <view>
+        <role>LogViewers</role>
+        <role>Operators</role>
+      </view>
+      <operate>
+        <role>Operators</role>
+      </operate>
+    </authorization>
+    <pipeline name="BUILD-SANDBOX">
+      <environmentvariables>
+        <variable name="ANYPNT-ENV-ID">
+          <value>48885761-5a5c-413e-8512-90e82c4eeab0</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>f59b6ab2-0a08-4553-acc7-c79c2b4cf6eb</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>spalavesam1</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>Sandbox</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>unitedairport</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:cp3bXVdC8J/QMclUC5GImA==:Uqch2riDNZjdoG3RkfkerA==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <git url="https://palavesam-inthub:Stor$123@github.com/palavesam-inthub/unitedairport" dest="unitedairport-src" />
+      </materials>
+      <stage name="Deploy" cleanWorkingDir="true">
+        <jobs>
+          <job name="DeploySandbox">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat" workingdir="unitedairport-src">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\mvn-mule-deploy.bat" workingdir="unitedairport-src">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+          <job name="RetrieveCloudHubDeploymentLog">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\get_cloudhub_deployment_log.bat" workingdir="unitedairport-src">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact type="build" src="unitedairport-src/target/%APP-NAME%*.jar" dest="unitedairport" />
+              <artifact type="build" src="unitedairport-src/deploymentLog.JSON" dest="unitedairport" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="TestHttpFlow1">
+      <environmentvariables>
+        <variable name="ANYPNT-ENV-ID">
+          <value>8fba6de0-8458-4933-bcbb-994fdcab97cb</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>mule-pals2</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>Sandbox</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>httpflow1</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.5</value>
+        </variable>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:rDuIuu+/wk9lDc8ECT2gmQ==:Dm0Cgx3ZPScue42kVMK+cA==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <git url="https://palavesam-inthub:Stor$123@github.com/palavesam-inthub/httpflow1" dest="app-src" />
+      </materials>
+      <stage name="defaultStage" cleanWorkingDir="true">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\mvn-mule-deploy.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact type="build" src="app-src/target/*.jar" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="BUILD-HttpFlow1" template="BUILD-Template">
+      <environmentvariables>
+        <variable name="ANYPNT-ENV-ID">
+          <value>8fba6de0-8458-4933-bcbb-994fdcab97cb</value>
+        </variable>
+        <variable name="ANYPNT-ORG-ID">
+          <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+        </variable>
+        <variable name="ANYPOINT-USRNAME">
+          <value>mule-pals2</value>
+        </variable>
+        <variable name="ANYPOINT-ENV-NAME">
+          <value>Sandbox</value>
+        </variable>
+        <variable name="APP-NAME">
+          <value>httpflow1</value>
+        </variable>
+        <variable name="ANYPOINT-URI">
+          <value>https://anypoint.mulesoft.com</value>
+        </variable>
+        <variable name="MULE-VERSION">
+          <value>4.1.4</value>
+        </variable>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+        <variable name="ANYPOINT-PASSWD" secure="true">
+          <encryptedValue>AES:rDuIuu+/wk9lDc8ECT2gmQ==:Dm0Cgx3ZPScue42kVMK+cA==</encryptedValue>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <git url="https://palavesam-inthub:Stor$123@github.com/palavesam-inthub/httpflow1" dest="httpflow1-src" />
+      </materials>
+    </pipeline>
+    <pipeline name="testDelay">
+      <environmentvariables>
+        <variable name="SCRIPTS-DIR">
+          <value>E:\INTHUB\CI-CD\scripts\</value>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <git url="https://palavesam-inthub:Stor$123@github.com/palavesam-inthub/unitedairport" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <exec command="call %SCRIPTS-DIR%\delayscript.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <pipelines group="Sid-TESTAPI">
+    <pipeline name="BUILD-WindAPI">
+      <materials>
+        <git url="https://github.com/palavesam-mule/mule-maven-deploy-cloudhub-test" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <ant />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+    <pipeline name="tttt" template="BUILD-Template">
+      <materials>
+        <pipeline pipelineName="TEST-PipeLine-TO-CLONE" stageName="FetchArtifacts" materialName="retrievecodefromGit" />
+      </materials>
+    </pipeline>
+  </pipelines>
+  <templates>
+    <pipeline name="BUILD-Template">
+      <stage name="defaultStage" cleanWorkingDir="true">
+        <approval type="success">
+          <authorization>
+            <user>goadmin</user>
+            <user>gocfgusr1</user>
+            <user>gocfgusr2</user>
+          </authorization>
+        </approval>
+        <environmentvariables>
+          <variable name="ANYPNT-ORG-ID">
+            <value>7c1661cd-9a75-4a57-8958-555c98995e62</value>
+          </variable>
+          <variable name="ANYPOINT-USRNAME">
+            <value>mule-pals2</value>
+          </variable>
+          <variable name="ANYPOINT-URI">
+            <value>https://anypoint.mulesoft.com</value>
+          </variable>
+          <variable name="SCRIPTS-DIR">
+            <value>E:\INTHUB\CI-CD\scripts\</value>
+          </variable>
+          <variable name="ANYPOINT-PASSWD" secure="true">
+            <encryptedValue>AES:jR3rwo3fSCiTmsry0ruGUA==:KhHTy6m3aGCZHX/wE/uIxA==</encryptedValue>
+          </variable>
+        </environmentvariables>
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <exec command="%SCRIPTS-DIR%\login-save-respfile.bat">
+                <arg>%ANYPOINT-USRNAME%</arg>
+                <arg>%ANYPOINT-PASSWD%</arg>
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\mvn-mule-deploy.bat">
+                <runif status="passed" />
+              </exec>
+              <exec command="%SCRIPTS-DIR%\get_cloudhub_deployment_log.bat">
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact type="build" src="app-src/target/*.jar" dest="build" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </templates>
+  <environments>
+    <environment name="CludHubRTM" />
+  </environments>
+  <agents>
+    <agent hostname="LAPTOP-91T6TMTM" ipaddress="127.0.0.1" uuid="50848bc8-5f3b-4dec-8464-d1f57a317879" />
+    <agent hostname="LAPTOP-91T6TMTM" ipaddress="127.0.0.1" uuid="9b28a153-b242-44df-b225-85faf982546d" />
+  </agents>
+</cruise>

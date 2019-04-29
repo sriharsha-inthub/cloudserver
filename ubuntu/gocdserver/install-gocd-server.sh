@@ -43,3 +43,37 @@
  echo "/etc/default/go-server   #contains all the environment variables with default values. These variable values can be changed as per requirement."
  echo ""
  echo "=============================================================="
+ 
+ echo "[Task 6]- Setup Users & Authorization roles"
+ echo "        - Install htpasswd "
+ apt install -y apache2-utils
+ mkdir /var/gocdauth/
+ cd /var/gocdauth/
+ echo "        - Create users "
+ echo "htpasswd -c -B adminpasswd goadmin"
+ echo "htpasswd -c -B userspasswd gouser"
+ echo "htpasswd -c -B adminpasswd pal"
+ echo "htpasswd -c -B adminpasswd sid"
+ echo "htpasswd -c -B adminpasswd sri"
+ echo "htpasswd -c -B adminpasswd lp"
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
