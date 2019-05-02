@@ -16,4 +16,4 @@ Continuoud Integration & Delivery - GoCD
 <hr>
 <img src="images/GoCD-Terminology.png">
 <hr>
-<img src="images/CICD-Workflow.png" width="1400" height="1200">
+<img src="images/CICD-Workflow.png" width="1200" height="1000">
