@@ -12,20 +12,20 @@
  apt-get update > /dev/null 2>&1
  
  echo "[Task 3]- Install JDK - Prequisite"
- echo "To Install oracle jdk ->> Visit oracle website"
- echo "Installing open jdk"
- add-apt-repository -y ppa:openjdk-r/ppa > /dev/null 2>&1
- apt update > /dev/null 2>&1
- echo "        - Removing & purge existing open jdk"
- apt-get remove --auto-remove -y openjdk*
- apt-get purge --auto-remove -y openjdk*
- echo "        - Install openjdk-8-jdk"
- apt install -y openjdk-8-jdk
- echo "[Task 4]- Setting JAVA_HOME"
- echo JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre/bin/java" | /etc/environment > /dev/null 2>&1
- cp environment /etc/environment
- source /etc/environment > /dev/null 2>&1
+ echo "To Install oracle jdk "
+ mkdir /usr/lib/java/
+ scp -i /home/sri/.ssh/do_id_rsa /mnt/c/Users/sriharsha/Downloads/jdk-8u211-linux-x64.tar.gz root@$1:/usr/lib/java/jdk-8u211-linux-x64.tar.gz
+ cd /usr/lib/java/
+ tar zxvf jdk-8u211-linux-x64.tar.gz
+ JAVA_HOME="/usr/lib/java/jdk1.8.0_211/"
+ JRE_HOME="/usr/lib/java/jdk1.8.0_211/jre/"
 
+ update-alternatives --install /usr/bin/java java /usr/lib/java/jdk1.8.0_211/bin/java 20000
+ update-alternatives --install /usr/bin/javac javac /usr/lib/java/jdk1.8.0_211/bin/javac 20000
+ 
+ chmod a+x /usr/bin/java
+ chmod a+x /usr/bin/javac
+ 
  echo $JAVA_HOME
  javac -version
  echo "[Task 5]- Install go agent"
