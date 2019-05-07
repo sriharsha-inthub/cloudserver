@@ -12,7 +12,7 @@
  apt-get update > /dev/null 2>&1
  
  echo "[Task 3]- Install JDK - Prequisite"
- echo "To Install oracle jdk "
+ echo "To Install Oracle jdk 1.8u211"
  #echo "Installing open jdk"
  #add-apt-repository -y ppa:openjdk-r/ppa > /dev/null 2>&1
  #apt update > /dev/null 2>&1
@@ -21,7 +21,7 @@
  #apt-get purge --auto-remove -y openjdk*
  #echo "        - Install openjdk-8-jdk"
  #apt install -y openjdk-8-jdk
- #echo "[Task 4]- Setting JAVA_HOME"
+ echo "[Task 4]- Setting JAVA_HOME"
  #echo JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre/bin/java" | /etc/environment > /dev/null 2>&1
  #cp environment /etc/environment
  #source /etc/environment > /dev/null 2>&1
@@ -41,14 +41,18 @@
  
  rm /etc/environment
  
- echo  JAVA_HOME="/usr/java/jdk1.8.0_211/" >> /etc/environment
- echo  JRE_HOME="/usr/java/jdk1.8.0_211/jre" >> /etc/environment
+ echo  JAVA_HOME="/usr/lib/java/jdk1.8.0_211/" >> /etc/environment
+ echo  JRE_HOME="/usr/lib/java/jdk1.8.0_211/jre/" >> /etc/environment
  
  source /etc/environment
  
  echo $JAVA_HOME
  javac -version
- echo "[Task 5]- Install go agent"
+ 
+ echo "[Task 5]- Install build automation tool - Maven"
+ apt install -y maven
+ 
+ echo "[Task 6]- Install go agent"
  apt install -y go-agent > /dev/null 2>&1
  echo "/etc/init.d/go-agent [start|stop|status|restart]"
  
